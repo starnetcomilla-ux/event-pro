@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EVENT PRO — প্রিমিয়াম ড্যাশবোর্ড</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #131a2b;
+    --panel2: #1b2438;
+    --border: rgba(148,163,184,.12);
+    --accent: #6366f1;
+    --accent2: #8b5cf6;
+    --cyan: #22d3ee;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --pink: #f472b6;
+    --red: #f87171;
+    --text: #e2e8f0;
+    --muted: #8b9bb4;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 85% -10%, rgba(99,102,241,.18), transparent 60%),
+      radial-gradient(800px 400px at -10% 40%, rgba(34,211,238,.10), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== Layout ===== */
+  .app { display: flex; }
+
+  /* ===== Sidebar ===== */
+  .sidebar {
+    width: 250px; flex-shrink: 0;
+    background: rgba(13,18,32,.9);
+    backdrop-filter: blur(14px);
+    border-right: 1px solid var(--border);
+    padding: 22px 14px;
+    display: flex; flex-direction: column; gap: 4px;
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto;
+  }
+  .logo { display: flex; align-items: center; gap: 11px; font-size: 20px; font-weight: 800; margin: 4px 8px 24px; }
+  .logo .mark {
+    width: 40px; height: 40px; border-radius: 13px;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    display: grid; place-items: center; font-size: 19px;
+    box-shadow: 0 6px 22px rgba(139,92,246,.5);
+  }
+  .logo em { font-style: normal; background: linear-gradient(90deg, var(--cyan), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 12px;
+    color: var(--muted); font-size: 14.5px; cursor: pointer;
+    transition: all .2s; border: 1px solid transparent;
+    user-select: none;
+  }
+  .nav-item:hover { background: rgba(99,102,241,.1); color: var(--text); }
+  .nav-item.active {
+    background: linear-gradient(90deg, rgba(99,102,241,.3), rgba(139,92,246,.1));
+    color: #fff; font-weight: 600;
+    border: 1px solid rgba(139,92,246,.35);
+    box-shadow: 0 4px 16px rgba(99,102,241,.2);
+  }
+  .nav-item .ico { font-size: 17px; width: 22px; text-align: center; }
+  .nav-item .count { margin-left: auto; font-size: 11px; background: rgba(99,102,241,.3); padding: 2px 8px; border-radius: 999px; color: #c7d2fe; }
+  .section-label { font-size: 10.5px; letter-spacing: 2px; color: #55637d; margin: 16px 12px 6px; }
+  .sidebar-card {
+    margin-top: auto;
+    background: linear-gradient(150deg, rgba(99,102,241,.22), rgba(244,114,182,.12));
+    border: 1px solid rgba(139,92,246,.4);
+    border-radius: var(--radius);
+    padding: 16px; font-size: 12.5px; color: var(--muted);
+  }
+  .sidebar-card b { color: #fff; display: block; margin-bottom: 6px; font-size: 13.5px; }
+  .sidebar-card button {
+    margin-top: 10px; width: 100%; padding: 9px; border: none; border-radius: 10px;
+    background: linear-gradient(90deg, var(--accent), var(--pink));
+    color: #fff; font-weight: 700; cursor: pointer; font-size: 12.5px;
+  }
+
+  /* ===== Main ===== */
+  .main { flex: 1; padding: 26px 30px 60px; max-width: 1280px; }
+  .page { display: none; animation: fade .35s ease; }
+  .page.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 14px; }
+  .topbar h1 { font-size: 25px; font-weight: 800; }
+  .grad { background: linear-gradient(90deg, var(--cyan), var(--accent2), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .topbar p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .search { background: var(--panel); border: 1px solid #2a3650; border-radius: 12px; padding: 10px 16px; color: var(--text); font-size: 13.5px; width: 210px; outline: none; transition: .2s; }
+  .search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.18); }
+  .btn {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: #fff; border: none; border-radius: 12px;
+    padding: 11px 20px; font-weight: 700; font-size: 13.5px; cursor: pointer;
+    box-shadow: 0 4px 18px rgba(99,102,241,.4); transition: .15s;
+    font-family: inherit;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(139,92,246,.5); }
+  .btn.ghost { background: var(--panel2); border: 1px solid var(--border); box-shadow: none; color: var(--text); }
+  .btn.small { padding: 7px 14px; font-size: 12.5px; border-radius: 10px; }
+  .btn.green { background: linear-gradient(90deg, #10b981, #34d399); box-shadow: 0 4px 16px rgba(52,211,153,.35); }
+  .btn.red { background: rgba(248,113,113,.15); color: var(--red); box-shadow: none; border: 1px solid rgba(248,113,113,.3); }
+
+  /* ===== Stat cards ===== */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 22px; }
+  .stat {
+    background: linear-gradient(160deg, var(--panel), rgba(19,26,43,.6));
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .stat:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(0,0,0,.4); }
+  .stat::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 3px; background: linear-gradient(90deg, var(--c1), var(--c2)); }
+  .stat .row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat .ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 19px; background: color-mix(in srgb, var(--c1) 16%, transparent); }
+  .stat .spark { color: var(--muted); opacity: .8; }
+  .stat .val { font-size: 27px; font-weight: 800; margin-top: 12px; }
+  .stat .label { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; margin-top: 9px; padding: 3.5px 9px; border-radius: 999px; }
+  .badge.up { background: rgba(52,211,153,.14); color: var(--green); }
+  .badge.down { background: rgba(248,113,113,.14); color: var(--red); }
+  .badge.neutral { background: rgba(251,191,36,.14); color: var(--amber); }
+  .s1 { --c1: #6366f1; --c2: #8b5cf6; }
+  .s2 { --c1: #22d3ee; --c2: #34d399; }
+  .s3 { --c1: #fbbf24; --c2: #f97316; }
+  .s4 { --c1: #f472b6; --c2: #a855f7; }
+  .s5 { --c1: #34d399; --c2: #22d3ee; }
+  .s6 { --c1: #f87171; --c2: #fb923c; }
+
+  /* ===== Panels & grid ===== */
+  .grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .panel h3 { font-size: 15.5px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .panel h3 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+  .panel h3 .right { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 500; }
+
+  /* ===== Table ===== */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 9px 12px; border-bottom: 1px solid rgba(148,163,184,.15); white-space: nowrap; }
+  td { padding: 12px; border-bottom: 1px solid rgba(148,163,184,.07); vertical-align: middle; }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover { background: rgba(99,102,241,.06); }
+  .person { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #fff;
+    flex-shrink: 0;
+  }
+  .a1 { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+  .a2 { background: linear-gradient(135deg,#22d3ee,#34d399); }
+  .a3 { background: linear-gradient(135deg,#fbbf24,#f97316); }
+  .a4 { background: linear-gradient(135deg,#f472b6,#a855f7); }
+  .a5 { background: linear-gradient(135deg,#f87171,#fb923c); }
+  .person .name { font-weight: 600; }
+  .person .sub { font-size: 11.5px; color: var(--muted); }
+  .tag { padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+  .tag.upcoming { background: rgba(99,102,241,.2); color: #a5b4fc; }
+  .tag.done { background: rgba(52,211,153,.16); color: var(--green); }
+  .tag.pending { background: rgba(251,191,36,.16); color: var(--amber); }
+  .tag.paid { background: rgba(52,211,153,.16); color: var(--green); }
+  .tag.unpaid { background: rgba(248,113,113,.16); color: var(--red); }
+  .tag.partial { background: rgba(251,191,36,.16); color: var(--amber); }
+  .money { font-weight: 700; color: #a5f3fc; }
+  .money.neg { color: #fda4af; }
+
+  /* ===== Progress bars ===== */
+  .prog { height: 7px; background: rgba(148,163,184,.12); border-radius: 999px; overflow: hidden; min-width: 90px; }
+  .prog i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--pink)); }
+
+  /* ===== Chart ===== */
+  .bars { display: flex; align-items: flex-end; gap: 12px; height: 170px; padding-top: 10px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; max-width: 38px; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, var(--accent2), var(--accent)); position: relative; transition: .3s; animation: grow 1s ease; transform-origin: bottom; }
+  .bar:hover { filter: brightness(1.25); }
+  .bar.income { background: linear-gradient(180deg, #34d399, #059669); }
+  @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  .bar-col .bl { font-size: 10.5px; color: var(--muted); }
+  .legend { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 12px; border-radius: 4px; }
+
+  /* ===== Donut ===== */
+  .donut-wrap { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+  .donut-legend div { display: flex; align-items: center; gap: 8px; }
+  .donut-legend i { width: 12px; height: 12px; border-radius: 4px; }
+  .donut-legend b { margin-left: auto; padding-left: 18px; }
+
+  /* ===== Quick actions ===== */
+  .quick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-item {
+    display: flex; align-items: center; gap: 11px;
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 13px 14px; cursor: pointer;
+    transition: all .2s; font-size: 13px; font-weight: 600;
+  }
+  .quick-item:hover { border-color: var(--accent); transform: translateY(-2px); background: rgba(99,102,241,.14); }
+  .quick-item .qi { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 15px; flex-shrink: 0; }
+  .q1 { background: rgba(99,102,241,.2); } .q2 { background: rgba(34,211,238,.2); }
+  .q3 { background: rgba(251,191,36,.2); } .q4 { background: rgba(244,114,182,.2); }
+
+  /* ===== Modal ===== */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(5,8,16,.7); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--panel); border: 1px solid rgba(139,92,246,.35);
+    border-radius: 20px; padding: 26px; width: 100%; max-width: 460px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6);
+    animation: pop .3s ease;
+  }
+  @keyframes pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+  .modal h2 { font-size: 19px; margin-bottom: 4px; }
+  .modal .sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%; padding: 11px 14px; border-radius: 11px;
+    background: var(--panel2); border: 1px solid #2a3650;
+    color: var(--text); font-size: 14px; outline: none; font-family: inherit;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.18); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .modal-actions .btn { flex: 1; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(90deg, #10b981, #34d399); color: #fff;
+    padding: 13px 26px; border-radius: 14px; font-weight: 700; font-size: 14px;
+    box-shadow: 0 10px 30px rgba(16,185,129,.4); transition: .35s; z-index: 200; opacity: 0;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ===== Chat ===== */
+  .chat-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; height: calc(100vh - 170px); min-height: 480px; }
+  .chat-contacts { overflow-y: auto; }
+  .contact {
+    display: flex; align-items: center; gap: 11px;
+    padding: 11px 10px; border-radius: 12px; cursor: pointer;
+    transition: background .15s; border: 1px solid transparent;
+  }
+  .contact:hover { background: rgba(99,102,241,.08); }
+  .contact.active { background: rgba(99,102,241,.16); border-color: rgba(139,92,246,.35); }
+  .c-info { min-width: 0; flex: 1; }
+  .c-info .name { font-size: 13.5px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .c-info .sub { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .online { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); flex-shrink: 0; }
+  .c-actions { display: flex; align-items: center; gap: 6px; }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--panel2); cursor: pointer; font-size: 14px;
+    display: grid; place-items: center; transition: .15s; flex-shrink: 0;
+  }
+  .icon-btn:hover { background: rgba(52,211,153,.2); border-color: var(--green); transform: scale(1.08); }
+  .unread { background: linear-gradient(90deg, var(--accent), var(--pink)); color: #fff; font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 2px 7px; }
+
+  .chat-window { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+  .chat-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 15px 20px; border-bottom: 1px solid var(--border);
+    background: rgba(99,102,241,.06);
+  }
+  .chat-header .name { font-weight: 700; font-size: 15px; }
+  .chat-header .sub { font-size: 11.5px; color: var(--muted); }
+  .chat-header-actions { margin-left: auto; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+  .msg {
+    max-width: 72%; padding: 10px 15px; border-radius: 16px;
+    font-size: 13.5px; line-height: 1.55; animation: pop .25s ease;
+  }
+  .msg.me { align-self: flex-end; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-bottom-right-radius: 5px; }
+  .msg.them { align-self: flex-start; background: var(--panel2); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
+  .chat-input { display: flex; gap: 8px; padding: 14px 16px; border-top: 1px solid var(--border); background: rgba(99,102,241,.04); }
+  .chat-input input {
+    flex: 1; padding: 11px 16px; border-radius: 12px;
+    background: var(--panel2); border: 1px solid #2a3650;
+    color: var(--text); font-size: 13.5px; outline: none; font-family: inherit;
+  }
+  .chat-input input:focus { border-color: var(--accent); }
+
+  /* ===== Call modal ===== */
+  .call-modal .modal { max-width: 380px; text-align: center; }
+  .call-avatar {
+    width: 92px; height: 92px; border-radius: 50%; margin: 10px auto 14px;
+    display: grid; place-items: center; font-size: 36px; color: #fff; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    box-shadow: 0 0 0 10px rgba(139,92,246,.12), 0 0 0 20px rgba(139,92,246,.06);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 10px rgba(139,92,246,.12); } 50% { box-shadow: 0 0 0 18px rgba(139,92,246,.05); } }
+  .call-status { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .call-actions { display: flex; justify-content: center; gap: 16px; }
+  .call-btn { width: 56px; height: 56px; border-radius: 50%; border: none; font-size: 22px; cursor: pointer; transition: .15s; }
+  .call-btn.accept { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 6px 20px rgba(16,185,129,.45); }
+  .call-btn.decline { background: rgba(248,113,113,.18); border: 1px solid rgba(248,113,113,.4); }
+  .call-btn:hover { transform: scale(1.1); }
+  .call-number { font-size: 13px; color: var(--cyan); font-weight: 700; margin-bottom: 6px; }
+
+  @media (max-width: 950px) {
+    .sidebar { display: none; }
+    .grid, .grid2 { grid-template-columns: 1fr; }
+    .main { padding: 20px 16px 60px; }
+    .chat-layout { grid-template-columns: 1fr; height: auto; }
+    .chat-messages { height: 320px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="logo"><div class="mark">🎉</div><span>EVENT <em>PRO</em></span></div>
+
+    <div class="section-label">মূল মেনু</div>
+    <div class="nav-item active" data-page="dashboard"><span class="ico">📊</span> ড্যাশবোর্ড</div>
+    <div class="nav-item" data-page="events"><span class="ico">📅</span> ইভেন্ট <span class="count">১২</span></div>
+
+    <div class="section-label">শ্রমিক ব্যবস্থাপনা</div>
+    <div class="nav-item" data-page="workers"><span class="ico">👷</span> শ্রমিক তালিকা <span class="count">২৪</span></div>
+    <div class="nav-item" data-page="wages"><span class="ico">💵</span> মজুরি হিসাব <span class="count">৫</span></div>
+    <div class="nav-item" data-page="attendance"><span class="ico">🗓️</span> ডিউটি রোস্টার</div>
+    <div class="nav-item" data-page="chat"><span class="ico">💬</span> চ্যাট ও কল <span class="count">৩</span></div>
+    <div class="nav-item" data-page="report"><span class="ico">📈</span> রিপোর্ট</div>
+
+    <div class="section-label">অন্যান্য</div>
+    <div class="nav-item" data-page="clients"><span class="ico">👥</span> ক্লায়েন্ট</div>
+    <div class="nav-item" data-page="payments"><span class="ico">💰</span> পেমেন্ট</div>
+    <div class="nav-item" data-page="settings"><span class="ico">⚙️</span> সেটিংস</div>
+
+    <div class="sidebar-card">
+      <b>⚡ প্রো আপগ্রেড</b>
+      অটো মজুরি ক্যালকুলেশন, SMS নোটিফিকেশন ও মাসিক রিপোর্ট আনলক করুন।
+      <button>এখনই আপগ্রেড করুন</button>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <!-- ======== PAGE: DASHBOARD ======== -->
+    <section class="page active" id="page-dashboard">
+      <div class="topbar">
+        <div>
+          <h1>শুভ সকাল, <span class="grad">স্বাগতম! 👋</span></h1>
+          <p>আজ ১৬ নভেম্বর ২০২৬ — আপনার ব্যবসার সম্পূর্ণ চিত্র</p>
+        </div>
+        <div class="top-actions">
+          <input class="search" placeholder="🔍 ইভেন্ট, শ্রমিক খুঁজুন..." />
+          <button class="btn" onclick="openEventModal()">＋ নতুন ইভেন্ট</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat s1">
+          <div class="row"><div class="ico">📅</div><svg class="spark" width="60" height="24"><polyline points="0,20 12,16 24,18 36,10 48,12 60,4" fill="none" stroke="#8b5cf6" stroke-width="2"/></svg></div>
+          <div class="val">৫০</div>
+          <div class="label">মোট ইভেন্ট</div>
+          <span class="badge up">▲ এই মাসে +৮</span>
+        </div>
+        <div class="stat s2">
+          <div class="row"><div class="ico">✅</div><svg class="spark" width="60" height="24"><polyline points="0,18 12,14 24,15 36,9 48,11 60,5" fill="none" stroke="#22d3ee" stroke-width="2"/></svg></div>
+          <div class="val">৩২</div>
+          <div class="label">সম্পন্ন ইভেন্ট</div>
+          <span class="badge up">▲ ৬৪% সফলতা</span>
+        </div>
+        <div class="stat s5">
+          <div class="row"><div class="ico">👷</div></div>
+          <div class="val">২৪</div>
+          <div class="label">সক্রিয় শ্রমিক</div>
+          <span class="badge neutral">● ১৮ জন আজ ডিউটিতে</span>
+        </div>
+        <div class="stat s3">
+          <div class="row"><div class="ico">💵</div></div>
+          <div class="val">৳৪২,৫০০</div>
+          <div class="label">মজুরি বাকি (অপরিশোধিত)</div>
+          <span class="badge down">▼ ৫ জন শ্রমিকের</span>
+        </div>
+        <div class="stat s4">
+          <div class="row"><div class="ico">💰</div><svg class="spark" width="60" height="24"><polyline points="0,20 12,17 24,12 36,14 48,8 60,3" fill="none" stroke="#f472b6" stroke-width="2"/></svg></div>
+          <div class="val">৳৮.৫ লক্ষ</div>
+          <div class="label">মোট আয়</div>
+          <span class="badge up">▲ ১২% গত মাসের চেয়ে</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <h3><span class="dot"></span> সাম্প্রতিক ইভেন্ট <span class="right">সব দেখুন ›</span></h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ইভেন্ট</th><th>তারিখ</th><th>শ্রমিক</th><th>অবস্থা</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="person"><div class="avatar a1">অ</div><div><div class="name">অন্নপ্রাশন অনুষ্ঠান</div><div class="sub">রাহাত হোসেন</div></div></div></td>
+                  <td>১৮ নভে</td><td>৬ জন</td><td><span class="tag upcoming">আসছে</span></td>
+                </tr>
+                <tr>
+                  <td><div class="person"><div class="avatar a2">বি</div><div><div class="name">বিয়ের অনুষ্ঠান</div><div class="sub">ফারিয়া আক্তার</div></div></div></td>
+                  <td>২২ নভে</td><td>১০ জন</td><td><span class="tag upcoming">আসছে</span></td>
+                </tr>
+                <tr>
+                  <td><div class="person"><div class="avatar a3">জ</div><div><div class="name">জন্মদিনের পার্টি</div><div class="sub">সাব্বির আহমেদ</div></div></div></td>
+                  <td>১০ নভে</td><td>৪ জন</td><td><span class="tag done">সম্পন্ন</span></td>
+                </tr>
+                <tr>
+                  <td><div class="person"><div class="avatar a4">ক</div><div><div class="name">কর্পোরেট ইভেন্ট</div><div class="sub">টেক লিমিটেড</div></div></div></td>
+                  <td>০৫ নভে</td><td>৮ জন</td><td><span class="tag pending">পেমেন্ট বাকি</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="dot"></span> দ্রুত কাজ</h3>
+          <div class="quick">
+            <div class="quick-item" onclick="openWorkerModal()"><span class="qi q1">👷</span> নতুন শ্রমিক</div>
+            <div class="quick-item" onclick="openWageModal()"><span class="qi q2">💵</span> মজুরি পরিশোধ</div>
+            <div class="quick-item" onclick="openEventModal()"><span class="qi q3">📅</span> নতুন ইভেন্ট</div>
+            <div class="quick-item"><span class="qi q4">👥</span> নতুন ক্লায়েন্ট</div>
+          </div>
+          <div style="margin-top:16px; background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:14px; font-size:12.5px; color:var(--muted);">
+            <b style="color:#fff; display:block; margin-bottom:6px;">🔔 নোটিফিকেশন</b>
+            ⏰ কাল ১৮ নভে — অন্নপ্রাশনে ৬ জন শ্রমিক দরকার<br>
+            💵 জন্মদিনের পার্টির মজুরি এখনো বাকি
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <h3><span class="dot"></span> আয় বনাম মজুরি খরচ (৬ মাস)</h3>
+          <div class="bars" id="chart"></div>
+          <div class="legend">
+            <span><i style="background:linear-gradient(180deg,#34d399,#059669)"></i> আয়</span>
+            <span><i style="background:linear-gradient(180deg,#8b5cf6,#6366f1)"></i> মজুরি খরচ</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3><span class="dot"></span> শ্রমিক ভূমিকা অনুযায়ী বিভাজন</h3>
+          <div class="donut-wrap">
+            <svg width="170" height="170" viewBox="0 0 42 42">
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#1b2438" stroke-width="6"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#6366f1" stroke-width="6" stroke-dasharray="42 58" stroke-dashoffset="25" stroke-linecap="round"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#22d3ee" stroke-width="6" stroke-dasharray="25 75" stroke-dashoffset="33" stroke-linecap="round"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#fbbf24" stroke-width="6" stroke-dasharray="20 80" stroke-dashoffset="8" stroke-linecap="round"/>
+              <circle cx="21" cy="21" r="15.9" fill="none" stroke="#f472b6" stroke-width="6" stroke-dasharray="13 87" stroke-dashoffset="38" stroke-linecap="round"/>
+              <text x="21" y="20.5" text-anchor="middle" fill="#e2e8f0" font-size="6" font-weight="800">২৪</text>
+              <text x="21" y="26" text-anchor="middle" fill="#8b9bb4" font-size="3">শ্রমিক</text>
+            </svg>
+            <div class="donut-legend">
+              <div><i style="background:#6366f1"></i> ওয়েটার <b>১০ জন</b></div>
+              <div><i style="background:#22d3ee"></i> রাঁধুনি / হেল্পার <b>৬ জন</b></div>
+              <div><i style="background:#fbbf24"></i> সাজসজ্জা কর্মী <b>৫ জন</b></div>
+              <div><i style="background:#f472b6"></i> সাউন্ড / লাইট <b>৩ জন</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: WORKERS ======== -->
+    <section class="page" id="page-workers">
+      <div class="topbar">
+        <div>
+          <h1>👷 <span class="grad">শ্রমিক তালিকা</span></h1>
+          <p>সব শ্রমিকের তথ্য, ভূমিকা ও ডিউটি স্ট্যাটাস</p>
+        </div>
+        <div class="top-actions">
+          <input class="search" placeholder="🔍 শ্রমিক খুঁজুন..." />
+          <button class="btn" onclick="openWorkerModal()">＋ নতুন শ্রমিক</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat s5"><div class="row"><div class="ico">👷</div></div><div class="val">২৪</div><div class="label">মোট শ্রমিক</div></div>
+        <div class="stat s2"><div class="row"><div class="ico">🟢</div></div><div class="val">১৮</div><div class="label">আজ ডিউটিতে</div></div>
+        <div class="stat s3"><div class="row"><div class="ico">🌴</div></div><div class="val">৪</div><div class="label">ছুটিতে</div></div>
+        <div class="stat s6"><div class="row"><div class="ico">💵</div></div><div class="val">৫</div><div class="label">মজুরি বাকি</div></div>
+      </div>
+
+      <div class="panel">
+        <h3><span class="dot"></span> সকল শ্রমিক</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>শ্রমিক</th><th>ভূমিকা</th><th>ফোন</th><th>দৈনিক মজুরি</th><th>মোট ইভেন্ট</th><th>মজুরি স্ট্যাটাস</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="person"><div class="avatar a1">ক</div><div><div class="name">করিম মিয়া</div><div class="sub">অভিজ্ঞ — ৫ বছর</div></div></div></td>
+                <td>হেড ওয়েটার</td><td>০১৭১১-২২৩৩৪৪</td><td class="money">৳৭০০</td><td>৪২</td><td><span class="tag paid">পরিশোধিত</span></td>
+              </tr>
+              <tr>
+                <td><div class="person"><div class="avatar a2">র</div><div><div class="name">রহিম উদ্দিন</div><div class="sub">মধ্যম — ৩ বছর</div></div></div></td>
+                <td>ওয়েটার</td><td>০১৮২২-৩৩৪৪৫৫</td><td class="money">৳৫০০</td><td>৩৫</td><td><span class="tag unpaid">৳১,০০০ বাকি</span></td>
+              </tr>
+              <tr>
+                <td><div class="person"><div class="avatar a3">স</div><div><div class="name">সেলিনা বেগম</div><div class="sub">অভিজ্ঞ — ৭ বছর</div></div></div></td>
+                <td>প্রধান রাঁধুনি</td><td>০১৯৩৩-৪৪৫৫৬৬</td><td class="money">৳৮০০</td><td>৫০</td><td><span class="tag paid">পরিশোধিত</span></td>
+              </tr>
+              <tr>
+                <td><div class="person"><div class="avatar a4">জ</div><div><div class="name">জাহাঙ্গীর আলম</div><div class="sub">নতুন — ১ বছর</div></div></div></td>
+                <td>সাজসজ্জা কর্মী</td><td>০১৬৪৪-৫৫৬৬৭৭</td><td class="money">৳৪৫০</td><td>১৮</td><td><span class="tag partial">৳৪৫০ বাকি</span></td>
+              </tr>
+              <tr>
+                <td><div class="person"><div class="avatar a5">ম</div><div><div class="name">মোছা. আয়েশা</div><div class="sub">মধ্যম — ৪ বছর</div></div></div></td>
+                <td>হেল্পার</td><td>০১৫৫৫-৬৬৭৭৮৮</td><td class="money">৳৪০০</td><td>২৮</td><td><span class="tag unpaid">৳৮০০ বাকি</span></td>
+              </tr>
+              <tr>
+                <td><div class="person"><div class="avatar a1">ন</div><div><div class="name">নাসির হোসেন</div><div class="sub">অভিজ্ঞ — ৬ বছর</div></div></div></td>
+                <td>সাউন্ড / লাইট</td><td>০১৭৬৬-৭৭৮৮৯৯</td><td class="money">৳৬৫০</td><td>৩০</td><td><span class="tag paid">পরিশোধিত</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: WAGES ======== -->
+    <section class="page" id="page-wages">
+      <div class="topbar">
+        <div>
+          <h1>💵 <span class="grad">মজুরি হিসাব</span></h1>
+          <p>প্রতিটি ইভেন্টে শ্রমিকদের মজুরি — পরিশোধিত ও বাকি</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn green" onclick="openWageModal()">✔ মজুরি পরিশোধ করুন</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat s2"><div class="row"><div class="ico">✅</div></div><div class="val">৳১,২৪,৫০০</div><div class="label">এই মাসে পরিশোধিত</div><span class="badge up">▲ ৩১ জন পেমেন্ট</span></div>
+        <div class="stat s6"><div class="row"><div class="ico">⏳</div></div><div class="val">৳৪২,৫০০</div><div class="label">বাকি মজুরি</div><span class="badge down">▼ ৫ জন শ্রমিক</span></div>
+        <div class="stat s3"><div class="row"><div class="ico">📅</div></div><div class="val">৳২,৪০০</div><div class="label">গড় ইভেন্ট-প্রতি খরচ</div><span class="badge neutral">প্রতি শ্রমিক</span></div>
+      </div>
+
+      <div class="panel">
+        <h3><span class="dot"></span> ইভেন্ট অনুযায়ী মজুরি বিবরণী</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ইভেন্ট</th><th>তারিখ</th><th>শ্রমিক সংখ্যা</th><th>মোট মজুরি</th><th>পরিশোধ</th><th>অবস্থা</th><th>অ্যাকশন</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>অন্নপ্রাশন অনুষ্ঠান</b><div class="sub" style="color:var(--muted);font-size:11.5px">রাহাত হোসেন</div></td>
+                <td>১৮ নভে</td><td>৬ জন</td><td class="money">৳৩,৬০০</td>
+                <td><div class="prog"><i style="width:0%"></i></div></td>
+                <td><span class="tag unpaid">অপরিশোধিত</span></td>
+                <td><button class="btn small green" onclick="payWage(this)">পরিশোধ</button></td>
+              </tr>
+              <tr>
+                <td><b>বিয়ের অনুষ্ঠান</b><div class="sub" style="color:var(--muted);font-size:11.5px">ফারিয়া আক্তার</div></td>
+                <td>২২ নভে</td><td>১০ জন</td><td class="money">৳৬,৫০০</td>
+                <td><div class="prog"><i style="width:0%"></i></div></td>
+                <td><span class="tag unpaid">অপরিশোধিত</span></td>
+                <td><button class="btn small green" onclick="payWage(this)">পরিশোধ</button></td>
+              </tr>
+              <tr>
+                <td><b>জন্মদিনের পার্টি</b><div class="sub" style="color:var(--muted);font-size:11.5px">সাব্বির আহমেদ</div></td>
+                <td>১০ নভে</td><td>৪ জন</td><td class="money">৳২,১০০</td>
+                <td><div class="prog"><i style="width:50%"></i></div></td>
+                <td><span class="tag partial">আধা পরিশোধ</span></td>
+                <td><button class="btn small green" onclick="payWage(this)">বাকি দিন</button></td>
+              </tr>
+              <tr>
+                <td><b>কর্পোরেট ইভেন্ট</b><div class="sub" style="color:var(--muted);font-size:11.5px">টেক লিমিটেড</div></td>
+                <td>০৫ নভে</td><td>৮ জন</td><td class="money">৳৪,৮০০</td>
+                <td><div class="prog"><i style="width:100%; background:linear-gradient(90deg,#10b981,#34d399)"></i></div></td>
+                <td><span class="tag paid">পরিশোধিত</span></td>
+                <td><button class="btn small ghost">রসিদ</button></td>
+              </tr>
+              <tr>
+                <td><b>মিলাদ মাহফিল</b><div class="sub" style="color:var(--muted);font-size:11.5px">আব্দুল করিম</div></td>
+                <td>০১ নভে</td><td>৩ জন</td><td class="money">৳১,৫০০</td>
+                <td><div class="prog"><i style="width:100%; background:linear-gradient(90deg,#10b981,#34d399)"></i></div></td>
+                <td><span class="tag paid">পরিশোধিত</span></td>
+                <td><button class="btn small ghost">রসিদ</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: ROSTER ======== -->
+    <section class="page" id="page-attendance">
+      <div class="topbar">
+        <div>
+          <h1>🗓️ <span class="grad">ডিউটি রোস্টার</span></h1>
+          <p>কোন ইভেন্টে কোন শ্রমিক কাজ করবে</p>
+        </div>
+        <button class="btn" onclick="openWorkerModal()">＋ ডিউটি অ্যাসাইন</button>
+      </div>
+
+      <div class="grid2" style="margin-top:0">
+        <div class="panel">
+          <h3><span class="dot"></span> 📅 অন্নপ্রাশন — ১৮ নভেম্বর</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>শ্রমিক</th><th>ভূমিকা</th><th>মজুরি</th></tr></thead>
+              <tbody>
+                <tr><td><div class="person"><div class="avatar a1">ক</div><b>করিম মিয়া</b></div></td><td>হেড ওয়েটার</td><td class="money">৳৭০০</td></tr>
+                <tr><td><div class="person"><div class="avatar a2">র</div><b>রহিম উদ্দিন</b></div></td><td>ওয়েটার</td><td class="money">৳৫০০</td></tr>
+                <tr><td><div class="person"><div class="avatar a3">স</div><b>সেলিনা বেগম</b></div></td><td>রাঁধুনি</td><td class="money">৳৮০০</td></tr>
+                <tr><td><div class="person"><div class="avatar a4">জ</div><b>জাহাঙ্গীর আলম</b></div></td><td>সাজসজ্জা</td><td class="money">৳৪৫০</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <h3><span class="dot"></span> 💍 বিয়ের অনুষ্ঠান — ২২ নভেম্বর</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>শ্রমিক</th><th>ভূমিকা</th><th>মজুরি</th></tr></thead>
+              <tbody>
+                <tr><td><div class="person"><div class="avatar a1">ক</div><b>করিম মিয়া</b></div></td><td>হেড ওয়েটার</td><td class="money">৳৭০০</td></tr>
+                <tr><td><div class="person"><div class="avatar a5">ম</div><b>মোছা. আয়েশা</b></div></td><td>হেল্পার</td><td class="money">৳৪০০</td></tr>
+                <tr><td><div class="person"><div class="avatar a1">ন</div><b>নাসির হোসেন</b></div></td><td>সাউন্ড / লাইট</td><td class="money">৳৬৫০</td></tr>
+                <tr><td><div class="person"><div class="avatar a2">র</div><b>রহিম উদ্দিন</b></div></td><td>ওয়েটার</td><td class="money">৳৫০০</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: CHAT & CALL ======== -->
+    <section class="page" id="page-chat">
+      <div class="topbar">
+        <div>
+          <h1>💬 <span class="grad">চ্যাট ও কল</span></h1>
+          <p>শ্রমিকদের সাথে মেসেজ করুন বা সরাসরি কল দিন</p>
+        </div>
+        <button class="btn" onclick="openGroupModal()">＋ গ্রুপ তৈরি</button>
+      </div>
+
+      <div class="chat-layout">
+        <!-- contact list -->
+        <div class="panel chat-contacts">
+          <input class="search" style="width:100%; margin-bottom:12px" placeholder="🔍 শ্রমিক খুঁজুন..." oninput="filterContacts(this.value)" />
+          <div class="contact active" data-name="করিম মিয়া" onclick="selectContact(this)">
+            <div class="avatar a1">ক</div>
+            <div class="c-info"><div class="name">করিম মিয়া <span class="online"></span></div><div class="sub">টাইপ করছেন...</div></div>
+            <div class="c-actions">
+              <button class="icon-btn" title="কল করুন" onclick="event.stopPropagation(); openCallModal('করিম মিয়া')">📞</button>
+            </div>
+          </div>
+          <div class="contact" data-name="রহিম উদ্দিন" onclick="selectContact(this)">
+            <div class="avatar a2">র</div>
+            <div class="c-info"><div class="name">রহিম উদ্দিন</div><div class="sub">আচ্ছা ভাই, আসছি</div></div>
+            <div class="c-actions"><span class="unread">২</span>
+              <button class="icon-btn" title="কল করুন" onclick="event.stopPropagation(); openCallModal('রহিম উদ্দিন')">📞</button>
+            </div>
+          </div>
+          <div class="contact" data-name="সেলিনা বেগম" onclick="selectContact(this)">
+            <div class="avatar a3">স</div>
+            <div class="c-info"><div class="name">সেলিনা বেগম <span class="online"></span></div><div class="sub">বাজার করে নিয়েছি</div></div>
+            <div class="c-actions">
+              <button class="icon-btn" title="কল করুন" onclick="event.stopPropagation(); openCallModal('সেলিনা বেগম')">📞</button>
+            </div>
+          </div>
+          <div class="contact" data-name="জাহাঙ্গীর আলম" onclick="selectContact(this)">
+            <div class="avatar a4">জ</div>
+            <div class="c-info"><div class="name">জাহাঙ্গীর আলম</div><div class="sub">কাল কটি চেয়ার লাগবে?</div></div>
+            <div class="c-actions">
+              <button class="icon-btn" title="কল করুন" onclick="event.stopPropagation(); openCallModal('জাহাঙ্গীর আলম')">📞</button>
+            </div>
+          </div>
+          <div class="contact" data-name="মোছা. আয়েশা" onclick="selectContact(this)">
+            <div class="avatar a5">আ</div>
+            <div class="c-info"><div class="name">মোছা. আয়েশা</div><div class="sub">সময়: সকাল ৯টা</div></div>
+            <div class="c-actions">
+              <button class="icon-btn" title="কল করুন" onclick="event.stopPropagation(); openCallModal('মোছা. আয়েশা')">📞</button>
+            </div>
+          </div>
+          <div class="contact group" data-name="🎉 অন্নপ্রাশন টিম (১৮ নভে)" onclick="selectContact(this)">
+            <div class="avatar a1">🎉</div>
+            <div class="c-info"><div class="name">অন্নপ্রাশন টিম</div><div class="sub">৬ জন শ্রমিক · গ্রুপ</div></div>
+            <div class="c-actions">
+              <button class="icon-btn" title="গ্রুপ কল" onclick="event.stopPropagation(); openCallModal('অন্নপ্রাশন টিম')">📞</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- chat window -->
+        <div class="panel chat-window">
+          <div class="chat-header">
+            <div class="avatar a1" id="chatAvatar">ক</div>
+            <div>
+              <div class="name" id="chatName">করিম মিয়া</div>
+              <div class="sub" id="chatStatus">🟢 অনলাইন · হেড ওয়েটার</div>
+            </div>
+            <div class="chat-header-actions">
+              <button class="btn small green" onclick="openCallModal(document.getElementById('chatName').textContent)">📞 কল করুন</button>
+            </div>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="msg them">আসসালামু আলাইকুম ভাই, কাল ১৮ নভে অন্নপ্রাশনে কতটা সময় লাগবে?</div>
+            <div class="msg them">মেনুতে ৬ জন ওয়েটার লাগবে।</div>
+            <div class="msg me">ওয়ালাইকুম সালাম। সকাল ৯টায় হাজিরা দিন, বিকাল ৫টা পর্যন্ত কাজ।</div>
+            <div class="msg me">মজুরি ৳৭০০ — কাজ শেষেই পরিশোধ করা হবে।</div>
+            <div class="msg them">জি ভাই, ঠিক আছে। সব শ্রমিককে জানিয়ে দিচ্ছি। 👍</div>
+          </div>
+          <div class="chat-input">
+            <input id="msgInput" placeholder="মেসেজ লিখুন..." onkeydown="if(event.key==='Enter') sendMsg()" />
+            <button class="btn small ghost" title="কল" onclick="openCallModal(document.getElementById('chatName').textContent)">📞</button>
+            <button class="btn small" onclick="sendMsg()">পাঠান ➤</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: REPORT ======== -->
+    <section class="page" id="page-report">
+      <div class="topbar">
+        <div>
+          <h1>📈 <span class="grad">রিপোর্ট</span></h1>
+          <p>প্রতিটি ইভেন্টের শ্রমিক ও মজুরি হিসাব — মাসিক সারসংক্ষেপসহ</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn ghost" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
+          <button class="btn">⬇ এক্সপোর্ট</button>
+        </div>
+      </div>
+
+      <!-- Monthly summary -->
+      <div class="stats">
+        <div class="stat s1"><div class="row"><div class="ico">📅</div></div><div class="val">৫</div><div class="label">এই মাসের ইভেন্ট</div></div>
+        <div class="stat s5"><div class="row"><div class="ico">👷</div></div><div class="val">৩১</div><div class="label">মোট শ্রমিক-ডিউটি (জন × ইভেন্ট)</div></div>
+        <div class="stat s3"><div class="row"><div class="ico">💵</div></div><div class="val">৳১৮,৫০০</div><div class="label">মোট মজুরি খরচ</div></div>
+        <div class="stat s2"><div class="row"><div class="ico">🏦</div></div><div class="val">৳১৬,০০০</div><div class="label">পরিশোধিত</div></div>
+        <div class="stat s6"><div class="row"><div class="ico">⏳</div></div><div class="val">৳২,৫০০</div><div class="label">বাকি</div></div>
+      </div>
+
+      <!-- Per-event worker & wage summary -->
+      <div class="panel">
+        <h3><span class="dot"></span> ইভেন্ট অনুযায়ী শ্রমিক ও মজুরি হিসাব (নভেম্বর ২০২৬)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ইভেন্ট</th><th>তারিখ</th><th>শ্রমিক সংখ্যা</th><th>গড় মজুরি</th><th>মোট মজুরি</th><th>পরিশোধিত</th><th>বাকি</th><th>স্ট্যাটাস</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>অন্নপ্রাশন অনুষ্ঠান</b></td><td>১৮ নভে</td><td><b>৬ জন</b></td><td>৳৬০০</td>
+                <td class="money">৳৩,৬০০</td><td class="money">৳০</td><td class="money neg">৳৩,৬০০</td>
+                <td><span class="tag unpaid">অপরিশোধিত</span></td>
+              </tr>
+              <tr>
+                <td><b>বিয়ের অনুষ্ঠান</b></td><td>২২ নভে</td><td><b>১০ জন</b></td><td>৳৬৫০</td>
+                <td class="money">৳৬,৫০০</td><td class="money">৳০</td><td class="money neg">৳৬,৫০০</td>
+                <td><span class="tag unpaid">অপরিশোধিত</span></td>
+              </tr>
+              <tr>
+                <td><b>জন্মদিনের পার্টি</b></td><td>১০ নভে</td><td><b>৪ জন</b></td><td>৳৫২৫</td>
+                <td class="money">৳২,১০০</td><td class="money">৳১,০৫০</td><td class="money neg">৳১,০৫০</td>
+                <td><span class="tag partial">আধা পরিশোধ</span></td>
+              </tr>
+              <tr>
+                <td><b>কর্পোরেট ইভেন্ট</b></td><td>০৫ নভে</td><td><b>৮ জন</b></td><td>৳৬০০</td>
+                <td class="money">৳৪,৮০০</td><td class="money">৳৪,৮০০</td><td class="money neg">৳০</td>
+                <td><span class="tag paid">পরিশোধিত</span></td>
+              </tr>
+              <tr>
+                <td><b>মিলাদ মাহফিল</b></td><td>০১ নভে</td><td><b>৩ জন</b></td><td>৳৫০০</td>
+                <td class="money">৳১,৫০০</td><td class="money">৳১,৫০০</td><td class="money neg">৳০</td>
+                <td><span class="tag paid">পরিশোধিত</span></td>
+              </tr>
+              <tr style="background:rgba(99,102,241,.1)">
+                <td><b>মোট 👉</b></td><td>৫টি ইভেন্ট</td><td><b>৩১ জন</b></td><td>—</td>
+                <td class="money"><b>৳১৮,৫০০</b></td><td class="money"><b>৳১৬,০০০</b></td><td class="money neg"><b>৳২,৫০০</b></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Monthly history -->
+      <div class="grid2">
+        <div class="panel">
+          <h3><span class="dot"></span> মাসিক হিসাবের ইতিহাস</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>মাস</th><th>ইভেন্ট</th><th>শ্রমিক-ডিউটি</th><th>মজুরি খরচ</th><th>মোট আয়</th></tr></thead>
+              <tbody>
+                <tr><td><b>নভেম্বর ২০২৬</b> <span class="tag upcoming" style="font-size:10px">চলমান</span></td><td>৫</td><td>৩১ জন</td><td class="money">৳১৮,৫০০</td><td class="money">৳৮৫,০০০</td></tr>
+                <tr><td>অক্টোবর ২০২৬</td><td>৭</td><td>৪৮ জন</td><td class="money">৳৩০,০০০</td><td class="money">৳১,১০,০০০</td></tr>
+                <tr><td>সেপ্টেম্বর ২০২৬</td><td>৬</td><td>৪১ জন</td><td class="money">৳২৬,০০০</td><td class="money">৳৯৫,০০০</td></tr>
+                <tr><td>আগস্ট ২০২৬</td><td>৪</td><td>২২ জন</td><td class="money">৳১৫,০০০</td><td class="money">৳৫৫,০০০</td></tr>
+                <tr><td>জুলাই ২০২৬</td><td>৫</td><td>৩৫ জন</td><td class="money">৳২২,০০০</td><td class="money">৳৮০,০০০</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <h3><span class="dot"></span> সারসংক্ষেপ</h3>
+          <div style="display:flex; flex-direction:column; gap:12px; font-size:13.5px;">
+            <div style="background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:14px;">
+              👷 <b>সবচেয়ে বেশি শ্রমিক লেগেছে:</b> বিয়ের অনুষ্ঠান (১০ জন)
+            </div>
+            <div style="background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:14px;">
+              💰 <b>সবচেয়ে বেশি মজুরি খরচ:</b> বিয়ের অনুষ্ঠান (৳৬,৫০০)
+            </div>
+            <div style="background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:14px;">
+              📊 <b>গড়ে প্রতি ইভেন্টে:</b> ৬.২ জন শ্রমিক, ৳৩,৭০০ মজুরি
+            </div>
+            <div style="background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.3); border-radius:12px; padding:14px;">
+              🟢 <b>লাভের অনুপাত:</b> প্রতি ৳১০০ আয়ে মজুরি খরচ মাত্র ৳২১
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: CLIENTS ======== -->
+    <section class="page" id="page-clients">
+      <div class="topbar">
+        <div><h1>👥 <span class="grad">ক্লায়েন্ট</span></h1><p>আপনার সব ক্লায়েন্টের তালিকা</p></div>
+        <button class="btn">＋ নতুন ক্লায়েন্ট</button>
+      </div>
+      <div class="panel">
+        <h3><span class="dot"></span> সকল ক্লায়েন্ট</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ক্লায়েন্ট</th><th>ফোন</th><th>মোট ইভেন্ট</th><th>মোট বিল</th><th>বাকি</th></tr></thead>
+            <tbody>
+              <tr><td><div class="person"><div class="avatar a1">রা</div><b>রাহাত হোসেন</b></div></td><td>০১৭১২-৩৪৫৬৭৮</td><td>৩</td><td class="money">৳৮৫,০০০</td><td class="money neg">৳০</td></tr>
+              <tr><td><div class="person"><div class="avatar a2">ফা</div><b>ফারিয়া আক্তার</b></div></td><td>০১৮২৩-৪৫৬৭৮৯</td><td>১</td><td class="money">৳১,২০,০০০</td><td class="money neg">৳২০,০০০</td></tr>
+              <tr><td><div class="person"><div class="avatar a3">টে</div><b>টেক লিমিটেড</b></div></td><td>০৯৬১১-২২৩৩৪৪</td><td>২</td><td class="money">৳২,৫০,০০০</td><td class="money neg">৳৫০,০০০</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: PAYMENTS ======== -->
+    <section class="page" id="page-payments">
+      <div class="topbar">
+        <div><h1>💰 <span class="grad">পেমেন্ট</span></h1><p>আয় ও খরচের হিসাব</p></div>
+        <button class="btn">＋ লেনদেন যোগ</button>
+      </div>
+      <div class="stats">
+        <div class="stat s2"><div class="row"><div class="ico">📈</div></div><div class="val">৳৮.৫ লক্ষ</div><div class="label">মোট আয়</div></div>
+        <div class="stat s6"><div class="row"><div class="ico">📉</div></div><div class="val">৳১.৯ লক্ষ</div><div class="label">মোট মজুরি খরচ</div></div>
+        <div class="stat s5"><div class="row"><div class="ico">🏦</div></div><div class="val">৳৬.৬ লক্ষ</div><div class="label">নিট লাভ</div><span class="badge up">▲ ৭৭% মার্জিন</span></div>
+      </div>
+    </section>
+
+    <!-- ======== PAGE: SETTINGS ======== -->
+    <section class="page" id="page-settings">
+      <div class="topbar">
+        <div><h1>⚙️ <span class="grad">সেটিংস</span></h1><p>ভাষা, থিম ও মজুরি নিয়ম</p></div>
+      </div>
+      <div class="panel" style="max-width:560px">
+        <h3><span class="dot"></span> মজুরি নিয়ম (ডিফল্ট দৈনিক রেট)</h3>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              <tr><td>ওয়েটার</td><td class="money">৳৫০০ / দিন</td></tr>
+              <tr><td>হেড ওয়েটার</td><td class="money">৳৭০০ / দিন</td></tr>
+              <tr><td>রাঁধুনি</td><td class="money">৳৮০০ / দিন</td></tr>
+              <tr><td>হেল্পার</td><td class="money">৳৪০০ / দিন</td></tr>
+              <tr><td>সাজসজ্জা কর্মী</td><td class="money">৳৪৫০ / দিন</td></tr>
+              <tr><td>সাউন্ড / লাইট</td><td class="money">৳৬৫০ / দিন</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px; display:flex; gap:10px;">
+          <button class="btn red" onclick="resetData()">🗑️ সব ডেটা রিসেট করুন</button>
+          <span style="font-size:12px; color:var(--muted); align-self:center;">💾 আপনার ডেটা এই ব্রাউজারে স্বয়ংক্রিয়ভাবে সেভ হচ্ছে</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal">
+    <h2>📅 নতুন ইভেন্ট</h2>
+    <div class="sub">নতুন ইভেন্টের তথ্য দিন</div>
+    <div class="field"><label>ইভেন্টের নাম</label><input placeholder="যেমন: বিয়ের অনুষ্ঠান" /></div>
+    <div class="field-row">
+      <div class="field"><label>তারিখ</label><input type="date" /></div>
+      <div class="field"><label>ক্লায়েন্ট</label><select><option>রাহাত হোসেন</option><option>ফারিয়া আক্তার</option><option>টেক লিমিটেড</option></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>শ্রমিক সংখ্যা</label><input type="number" placeholder="যেমন: ৬" /></div>
+      <div class="field"><label>প্রতি শ্রমিক মজুরি (৳)</label><input type="number" placeholder="যেমন: ৫০০" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModals()">বাতিল</button>
+      <button class="btn" onclick="addEvent()">সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="workerModal">
+  <div class="modal">
+    <h2>👷 নতুন শ্রমিক / ডিউটি</h2>
+    <div class="sub">শ্রমিকের তথ্য ও ইভেন্টে ডিউটি দিন</div>
+    <div class="field"><label>শ্রমিকের নাম</label><input placeholder="পূর্ণ নাম" /></div>
+    <div class="field-row">
+      <div class="field"><label>ভূমিকা</label><select><option>ওয়েটার</option><option>হেড ওয়েটার</option><option>রাঁধুনি</option><option>হেল্পার</option><option>সাজসজ্জা কর্মী</option><option>সাউন্ড / লাইট</option></select></div>
+      <div class="field"><label>ফোন</label><input placeholder="০১৭xx-xxxxxx" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>ইভেন্ট</label><select><option>অন্নপ্রাশন — ১৮ নভে</option><option>বিয়ের অনুষ্ঠান — ২২ নভে</option></select></div>
+      <div class="field"><label>মজুরি (৳)</label><input type="number" placeholder="৫০০" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModals()">বাতিল</button>
+      <button class="btn" onclick="addWorker()">সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="wageModal">
+  <div class="modal">
+    <h2>💵 মজুরি পরিশোধ</h2>
+    <div class="sub">শ্রমিককে মজুরি পরিশোধ করুন</div>
+    <div class="field"><label>শ্রমিক</label><select><option>রহিম উদ্দিন — ৳১,০০০ বাকি</option><option>জাহাঙ্গীর আলম — ৳৪৫০ বাকি</option><option>মোছা. আয়েশা — ৳৮০০ বাকি</option></select></div>
+    <div class="field-row">
+      <div class="field"><label>পরিমাণ (৳)</label><input type="number" placeholder="১০০০" /></div>
+      <div class="field"><label>পেমেন্ট মাধ্যম</label><select><option>নগদ টাকা</option><option>bKash</option><option>Nagad</option><option>ব্যাংক</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModals()">বাতিল</button>
+      <button class="btn green" onclick="closeModals(); showToast('✅ মজুরি পরিশোধ সম্পন্ন!')">✔ পরিশোধ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay call-modal" id="callModal">
+  <div class="modal">
+    <div class="call-avatar" id="callAvatar">ক</div>
+    <h2 id="callName">করিম মিয়া</h2>
+    <div class="call-number" id="callNumber">📞 ০১৭১১-২২৩৩৪৪</div>
+    <div class="call-status" id="callStatus">কল করা হচ্ছে...</div>
+    <div class="call-actions">
+      <a id="callDialLink" href="tel:+8801711223344" style="text-decoration:none"><button class="call-btn accept" title="মোবাইলে কল করুন">✆</button></a>
+      <button class="call-btn decline" title="কল কাটুন" onclick="closeModals()">✕</button>
+    </div>
+    <div style="margin-top:16px; font-size:12px; color:var(--muted);">💡 মোবাইলে সবুজ বাটনে চাপ দিলে সরাসরি ফোন অ্যাপ খুলে নম্বর ডায়াল হবে</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ----- Data persistence (localStorage) -----
+  var DB_KEY = 'eventpro_data_v1';
+  function saveState() {
+    try {
+      var data = {
+        workers: document.querySelector('#page-workers tbody').innerHTML,
+        wages: document.querySelector('#page-wages tbody').innerHTML,
+        events: document.querySelector('#page-dashboard .table-wrap tbody').innerHTML,
+        report: document.querySelector('#page-report .table-wrap tbody').innerHTML
+      };
+      localStorage.setItem(DB_KEY, JSON.stringify(data));
+    } catch (e) { /* সেভ ব্যর্থ হলেও অ্যাপ চলবে */ }
+  }
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(DB_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      if (data.workers) document.querySelector('#page-workers tbody').innerHTML = data.workers;
+      if (data.wages) document.querySelector('#page-wages tbody').innerHTML = data.wages;
+      if (data.events) document.querySelector('#page-dashboard .table-wrap tbody').innerHTML = data.events;
+      if (data.report) document.querySelector('#page-report .table-wrap tbody').innerHTML = data.report;
+      // রিস্টোরের পর পেমেন্ট বাটনে আবার ইভেন্ট লাগানো
+      document.querySelectorAll('#page-wages tbody').forEach(function (tb) {
+        tb.querySelectorAll('button').forEach(function (b) {
+          if (b.textContent.indexOf('পরিশোধ') !== -1 && !b.getAttribute('onclick')) {
+            b.setAttribute('onclick', 'payWage(this)');
+          }
+        });
+      });
+    } catch (e) { /* ভাঙা ডেটা হলে উপেক্ষা */ }
+  }
+  function resetData() {
+    if (confirm('সব সেভ করা ডেটা মুছে যাবে। নিশ্চিত?')) {
+      localStorage.removeItem(DB_KEY);
+      location.reload();
+    }
+  }
+  window.addEventListener('DOMContentLoaded', loadState);
+
+  // ----- Add worker from modal -----
+  function addWorker() {
+    var m = document.getElementById('workerModal');
+    var name = m.querySelectorAll('input')[0].value.trim() || 'নতুন শ্রমিক';
+    var role = m.querySelectorAll('select')[0].value;
+    var phone = m.querySelectorAll('input')[1].value.trim() || '—';
+    var wage = m.querySelectorAll('input')[2].value.trim() || '৫০০';
+    var rates = { 'ওয়েটার': '৳৫০০', 'হেড ওয়েটার': '৳৭০০', 'রাঁধুনি': '৳৮০০', 'হেল্পার': '৳৪০০', 'সাজসজ্জা কর্মী': '৳৪৫০', 'সাউন্ড / লাইট': '৳৬৫০' };
+    var avClass = 'a' + (1 + Math.floor(Math.random() * 5));
+    var initial = name.charAt(0);
+    var row = '<tr>' +
+      '<td><div class="person"><div class="avatar ' + avClass + '">' + initial + '</div><div><div class="name">' + name + '</div><div class="sub">নতুন</div></div></div></td>' +
+      '<td>' + role + '</td><td>' + phone + '</td><td class="money">' + (rates[role] || '৳' + wage) + '</td><td>০</td>' +
+      '<td><span class="tag unpaid">মজুরি বাকি</span></td></tr>';
+    document.querySelector('#page-workers tbody').insertAdjacentHTML('beforeend', row);
+    closeModals();
+    showToast('✅ নতুন শ্রমিক যোগ ও সেভ হয়েছে!');
+    saveState();
+  }
+  // ----- Add event from modal -----
+  function addEvent() {
+    var m = document.getElementById('eventModal');
+    var name = m.querySelectorAll('input')[0].value.trim() || 'নতুন ইভেন্ট';
+    var workers = m.querySelectorAll('input')[1].value.trim() || '০';
+    var wage = m.querySelectorAll('input')[2].value.trim() || '০';
+    var avClass = 'a' + (1 + Math.floor(Math.random() * 5));
+    var initial = name.charAt(0);
+    var total = '৳' + (Number(workers) * Number(wage) || 0).toLocaleString('bn-BD');
+    document.querySelector('#page-dashboard .table-wrap tbody').insertAdjacentHTML('beforeend',
+      '<tr><td><div class="person"><div class="avatar ' + avClass + '">' + initial + '</div><div><div class="name">' + name + '</div><div class="sub">নতুন ক্লায়েন্ট</div></div></div></td>' +
+      '<td>—</td><td>' + workers + ' জন</td><td><span class="tag upcoming">আসছে</span></td></tr>');
+    document.querySelector('#page-report .table-wrap tbody tr:last-child') && document.querySelector('#page-report .table-wrap tbody').insertAdjacentHTML('beforeend',
+      '<tr><td><b>' + name + '</b></td><td>—</td><td><b>' + workers + ' জন</b></td><td>' + wage + '৳</td>' +
+      '<td class="money">' + total + '</td><td class="money">৳০</td><td class="money neg">' + total + '</td>' +
+      '<td><span class="tag unpaid">অপরিশোধিত</span></td></tr>');
+    closeModals();
+    showToast('✅ ইভেন্ট যোগ ও সেভ হয়েছে!');
+    saveState();
+  }
+
+  // ----- Navigation -----
+  document.querySelectorAll('.nav-item').forEach(function (item) {
+    item.addEventListener('click', function () {
+      document.querySelectorAll('.nav-item').forEach(function (n) { n.classList.remove('active'); });
+      item.classList.add('active');
+      document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
+      document.getElementById('page-' + item.dataset.page).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // ----- Chart (income vs wages, 6 months) -----
+  var data = [
+    { m: 'জুন
+...
+
+[Message clipped]  View entire message
